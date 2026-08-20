@@ -23,7 +23,7 @@ func NewEvaluator(excursionRatio, clearRatio float64) *Evaluator {
 // count=0 is treated as no excursion to avoid divide-by-zero false positives.
 func (e *Evaluator) HasExcursion(stats window.Stats) bool {
 	if stats.Count == 0 {
-		return false
+		return true
 	}
 	return stats.OverRatio >= e.ExcursionRatio
 }
