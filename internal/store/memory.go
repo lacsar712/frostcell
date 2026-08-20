@@ -34,14 +34,18 @@ func NewMemoryStore() *MemoryStore {
 }
 
 // SaveSnapshot upserts the latest window snapshot for a cell.
+// The stored snapshot owns a defensive copy of its temps so later caller
+// mutations to the input cannot dirty the stored record.
 func (m *MemoryStore) SaveSnapshot(snap model.WindowSnapshot) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.snapshots[snap.CellID] = snap
+	m.snapshots[snap.CellID] = cloneSnapshot(snap)
 	m.updated = time.Now()
 }
 
 // GetSnapshot returns the stored snapshot if present.
+// The returned snapshot owns a defensive copy of its temps so caller
+// mutations cannot dirty the stored record.
 func (m *MemoryStore) GetSnapshot(cellID string) (model.WindowSnapshot, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -49,7 +53,7 @@ func (m *MemoryStore) GetSnapshot(cellID string) (model.WindowSnapshot, bool) {
 	if !ok {
 		return model.WindowSnapshot{}, false
 	}
-	return s, true
+	return cloneSnapshot(s), true
 }
 
 // SaveAlarm upserts alarm metadata.

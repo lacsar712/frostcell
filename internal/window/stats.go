@@ -26,7 +26,7 @@ func computeStats(buf *ringBuffer, isOver func(tempC float64) bool) Stats {
 	var sum float64
 	var overCount int
 	maxTemp := buf.points[0].tempC
-	samples := buf.ensureTempScratch()
+	samples := buf.copyTemps()
 
 	for _, p := range buf.points {
 		sum += p.tempC
