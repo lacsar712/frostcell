@@ -25,7 +25,7 @@ func NewPolicy(cell model.Cell, eval *Evaluator) *Policy {
 
 // ActiveOverPredicate returns the predicate used while monitoring excursions.
 func (p *Policy) ActiveOverPredicate() func(float64) bool {
-	return OverPredicate(p.Cell, p.ClearMode)
+	return OverPredicate(p.Cell, p.ActiveMode)
 }
 
 // ClearingOverPredicate returns the predicate used while clearing alarms.

@@ -86,7 +86,7 @@ func (c *Coordinator) ProcessSample(sample model.ProbeSample, now time.Time) (mo
 func (c *Coordinator) syncOverPredicate(cellID string, state model.AlarmState, policy *threshold.Policy) {
 	var fn func(float64) bool
 	switch state {
-	case model.StateClearing, model.StateActive:
+	case model.StateClearing:
 		fn = policy.ClearingOverPredicate()
 	default:
 		fn = policy.ActiveOverPredicate()
