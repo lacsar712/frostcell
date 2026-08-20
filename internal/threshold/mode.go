@@ -23,12 +23,14 @@ func (m Mode) String() string {
 }
 
 // IsOver returns true when temp exceeds the limit for the given mode.
+// ModeClearing uses ClearLimit (the hysteresis-offset threshold) so the alarm
+// cannot re-arm the instant the reading touches the upper line.
 func IsOver(tempC float64, cell model.Cell, mode Mode) bool {
 	switch mode {
 	case ModeActive:
 		return tempC > cell.UpperLimit()
 	case ModeClearing:
-		return tempC > cell.UpperLimit()
+		return tempC > cell.ClearLimit()
 	default:
 		return tempC > cell.UpperLimit()
 	}

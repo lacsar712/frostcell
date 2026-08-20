@@ -18,8 +18,12 @@ func (c Cell) UpperLimit() float64 {
 }
 
 // ClearLimit returns the clearing threshold with hysteresis applied.
+// It sits HysteresisC below UpperLimit so the temperature must cool past the
+// excursion line by the hysteresis margin before an alarm can clear. Without
+// this margin the reading dithers at the edge and the alarm churns between
+// Active and Clearing.
 func (c Cell) ClearLimit() float64 {
-	return c.SetpointC + c.DeltaC
+	return c.UpperLimit() - c.HysteresisC
 }
 
 // Validate checks that cell parameters are sane for monitoring.
