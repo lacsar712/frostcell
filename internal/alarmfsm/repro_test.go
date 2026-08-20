@@ -55,8 +55,9 @@ func TestWindowClosedUsesProcessingClock(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Probe timestamp is 6 minutes ahead of the processing clock.
-	lateTS := base.Add(6 * time.Minute)
+	// Probe timestamp is ahead of the processing clock but not so far that AddSample
+	// expires the oldest point. Closure must still key off `now`, not sample.TS/lastEnd.
+	lateTS := base.Add(5 * time.Minute)
 	now := base.Add(2 * time.Minute)
 	res, err := coord.ProcessSample(model.ProbeSample{
 		CellID: cell.ID, ProbeID: "p1", TempC: -15, TS: lateTS,
