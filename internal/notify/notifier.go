@@ -105,7 +105,9 @@ func (s *Service) sendOne(ctx context.Context, ev model.AlarmEvent) SendResult {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if !result.Success {
+	if result.Success {
+		s.circuit.RecordSuccess()
+	} else {
 		s.circuit.RecordFailure()
 	}
 	return result
