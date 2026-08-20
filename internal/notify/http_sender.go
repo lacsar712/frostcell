@@ -50,7 +50,7 @@ func (h *HTTPSender) Send(ctx context.Context, event model.AlarmEvent) SendResul
 		return SendResult{Kind: FailureUnknown, Err: err, Success: false}
 	}
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, h.URL, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, h.URL, bytes.NewReader(body))
 	if err != nil {
 		return SendResult{Kind: FailureUnknown, Err: err, Success: false}
 	}
