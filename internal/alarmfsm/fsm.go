@@ -120,7 +120,9 @@ func (f *FSM) stepNormal(in Input, events *[]model.AlarmEvent) Context {
 
 func (f *FSM) stepPending(in Input, events *[]model.AlarmEvent) Context {
 	ctx := f.ctx
-	if in.HasExcursion {
+	// Consecutive excursion windows only count once the window has closed;
+	// mid-window samples must not pre-climb the counter toward Active.
+	if in.WindowClosed && in.HasExcursion {
 		ctx.ConsecutiveExcursions++
 		if ctx.ConsecutiveExcursions >= f.pendingWindows {
 			f.state = model.StateActive
