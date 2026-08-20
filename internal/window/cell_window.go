@@ -115,5 +115,5 @@ func (w *CellWindow) IsWindowClosed(now time.Time) bool {
 func (w *CellWindow) SampleTemps() []float64 {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	return w.buf.copyTemps()
+	return w.buf.ensureTempScratch()
 }

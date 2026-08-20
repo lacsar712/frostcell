@@ -26,10 +26,9 @@ func computeStats(buf *ringBuffer, isOver func(tempC float64) bool) Stats {
 	var sum float64
 	var overCount int
 	maxTemp := buf.points[0].tempC
-	samples := make([]float64, count)
+	samples := buf.ensureTempScratch()
 
-	for i, p := range buf.points {
-		samples[i] = p.tempC
+	for _, p := range buf.points {
 		sum += p.tempC
 		if p.tempC > maxTemp {
 			maxTemp = p.tempC
@@ -52,11 +51,6 @@ func computeStats(buf *ringBuffer, isOver func(tempC float64) bool) Stats {
 
 // ToSnapshot converts stats into an API snapshot at windowEnd.
 func (s Stats) ToSnapshot(cellID string, windowEnd time.Time, windowDur time.Duration) model.WindowSnapshot {
-	var temps []float64
-	if len(s.Samples) > 0 {
-		temps = make([]float64, len(s.Samples))
-		copy(temps, s.Samples)
-	}
 	return model.WindowSnapshot{
 		CellID:    cellID,
 		Count:     s.Count,
@@ -66,6 +60,6 @@ func (s Stats) ToSnapshot(cellID string, windowEnd time.Time, windowDur time.Dur
 		OverRatio: s.OverRatio,
 		WindowEnd: windowEnd,
 		WindowDur: windowDur,
-		Temps:     temps,
+		Temps:     s.Samples,
 	}
 }
