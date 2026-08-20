@@ -102,11 +102,7 @@ func (w *CellWindow) IsWindowClosed(now time.Time) bool {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	ref := now
-	if !w.lastEnd.IsZero() {
-		ref = w.lastEnd
-	}
-	cutoff := ref.Add(-w.windowDur)
+	cutoff := now.Add(-w.windowDur)
 	w.buf.expireBefore(cutoff)
 	if w.buf.len() == 0 {
 		return false
