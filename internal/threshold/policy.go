@@ -35,7 +35,7 @@ func (p *Policy) ClearingOverPredicate() func(float64) bool {
 
 // ShouldEnterPending evaluates whether a closed window warrants Pending.
 func (p *Policy) ShouldEnterPending(stats window.Stats, windowClosed bool) bool {
-	if !windowClosed {
+	if !windowClosed || stats.Count == 0 {
 		return false
 	}
 	return p.Evaluator.HasExcursion(stats)
