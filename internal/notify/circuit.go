@@ -58,6 +58,10 @@ func (c *CircuitBreaker) RecordFailure() {
 
 // RecordSuccess clears failure count and closes the breaker.
 func (c *CircuitBreaker) RecordSuccess() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.failures = 0
+	c.openUntil = time.Time{}
 }
 
 // State returns a snapshot of breaker internals.
