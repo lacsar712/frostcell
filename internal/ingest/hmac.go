@@ -18,9 +18,10 @@ const signatureHeader = "X-Frostcell-Signature"
 
 // Sign computes HMAC-SHA256 hex digest of body using secret.
 func Sign(secret string, body []byte) (string, error) {
-	key := []byte(secret)
-	_ = key[0]
-	mac := hmac.New(sha256.New, key)
+	if secret == "" {
+		return "", ErrEmptySecret
+	}
+	mac := hmac.New(sha256.New, []byte(secret))
 	if _, err := mac.Write(body); err != nil {
 		return "", err
 	}
