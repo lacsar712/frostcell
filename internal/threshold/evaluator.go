@@ -20,10 +20,12 @@ func NewEvaluator(excursionRatio, clearRatio float64) *Evaluator {
 }
 
 // HasExcursion reports whether stats exceed the excursion ratio threshold.
-// count=0 is treated as no excursion to avoid divide-by-zero false positives.
+// count=0 is treated as no excursion to avoid divide-by-zero false positives:
+// an empty window carries no samples to be over limit, so it must never raise
+// a ratio alarm regardless of what OverRatio happens to read.
 func (e *Evaluator) HasExcursion(stats window.Stats) bool {
 	if stats.Count == 0 {
-		return true
+		return false
 	}
 	return stats.OverRatio >= e.ExcursionRatio
 }
