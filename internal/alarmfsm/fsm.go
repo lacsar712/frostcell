@@ -111,10 +111,10 @@ func (f *FSM) Step(in Input) Result {
 func (f *FSM) stepNormal(in Input, events *[]model.AlarmEvent) Context {
 	ctx := f.ctx
 	if in.WindowClosed && in.HasExcursion {
-		f.state = model.StateActive
-		f.lastRaised = in.Now
-		*events = append(*events, f.event(model.EventAlarmRaised, in))
-		ctx.ConsecutiveExcursions = 0
+		// Over-limit must pass through Pending before escalating to Active;
+		// the first excursion starts the confirmation window and counts toward it.
+		f.state = model.StatePending
+		ctx.ConsecutiveExcursions = 1
 		ctx.ClearingWindows = 0
 	}
 	return ctx
@@ -195,7 +195,8 @@ func (f *FSM) buildEvent(in Input) model.AlarmEvent {
 func CanTransition(from, to model.AlarmState) bool {
 	switch from {
 	case model.StateNormal:
-		return to == model.StatePending || to == model.StateActive
+		// Over-limit must pass through Pending; a direct Normal->Active jump is illegal.
+		return to == model.StatePending
 	case model.StatePending:
 		return to == model.StateActive || to == model.StateNormal
 	case model.StateActive:
@@ -209,6 +210,9 @@ func CanTransition(from, to model.AlarmState) bool {
 
 // ValidateTransition returns an error for illegal jumps such as Normal→Active.
 func ValidateTransition(from, to model.AlarmState) error {
+	if from == model.StateNormal && to == model.StateActive {
+		return fmt.Errorf("illegal transition: %s -> %s (must pass Pending)", from, to)
+	}
 	if !CanTransition(from, to) && from != to {
 		return fmt.Errorf("illegal transition: %s -> %s", from, to)
 	}
