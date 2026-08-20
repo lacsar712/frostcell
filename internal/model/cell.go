@@ -19,7 +19,7 @@ func (c Cell) UpperLimit() float64 {
 
 // ClearLimit returns the clearing threshold with hysteresis applied.
 func (c Cell) ClearLimit() float64 {
-	return c.SetpointC + c.DeltaC
+	return c.SetpointC + c.DeltaC - c.HysteresisC
 }
 
 // Validate checks that cell parameters are sane for monitoring.
