@@ -108,6 +108,9 @@ func (c *Coordinator) buildInput(fsm *FSM, policy *threshold.Policy, snap model.
 	}
 
 	hasExcursion := policy.ShouldEnterPending(stats, closed)
+	if fsm.State() == model.StatePending {
+		hasExcursion = stats.Count > 0 && policy.Evaluator.HasExcursion(stats)
+	}
 	isClearing := policy.ShouldEnterClearing(stats, closed)
 
 	if fsm.State() == model.StateClearing {
