@@ -87,11 +87,7 @@ func (c *Coordinator) syncOverPredicate(cellID string, state model.AlarmState, p
 	var fn func(float64) bool
 	switch state {
 	case model.StateClearing, model.StateActive:
-		if state == model.StateClearing {
-			fn = policy.ClearingOverPredicate()
-		} else {
-			fn = policy.ActiveOverPredicate()
-		}
+		fn = policy.ClearingOverPredicate()
 	default:
 		fn = policy.ActiveOverPredicate()
 	}
