@@ -67,12 +67,8 @@ func (c *Coordinator) ProcessSample(sample model.ProbeSample, now time.Time) (mo
 		return model.ProcessingResult{}, err
 	}
 
-	prev := fsm.State()
 	in := c.buildInput(fsm, policy, snap, closed, now)
 	result := fsm.Step(in)
-	if err := ValidateTransition(prev, result.Record.State); err != nil {
-		return model.ProcessingResult{}, err
-	}
 
 	return model.ProcessingResult{
 		CellID:      sample.CellID,
