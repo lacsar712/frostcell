@@ -37,7 +37,7 @@ func NewMemoryStore() *MemoryStore {
 func (m *MemoryStore) SaveSnapshot(snap model.WindowSnapshot) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.snapshots[snap.CellID] = snap
+	m.snapshots[snap.CellID] = cloneSnapshot(snap)
 	m.updated = time.Now()
 }
 
@@ -46,7 +46,10 @@ func (m *MemoryStore) GetSnapshot(cellID string) (model.WindowSnapshot, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	s, ok := m.snapshots[cellID]
-	return s, ok
+	if !ok {
+		return model.WindowSnapshot{}, false
+	}
+	return cloneSnapshot(s), true
 }
 
 // SaveAlarm upserts alarm metadata.
@@ -82,7 +85,7 @@ func (m *MemoryStore) ListSnapshots() []model.WindowSnapshot {
 	defer m.mu.RUnlock()
 	out := make([]model.WindowSnapshot, 0, len(m.snapshots))
 	for _, s := range m.snapshots {
-		out = append(out, s)
+		out = append(out, cloneSnapshot(s))
 	}
 	return out
 }
@@ -92,4 +95,14 @@ func (m *MemoryStore) LastUpdated() time.Time {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return m.updated
+}
+
+func cloneSnapshot(snap model.WindowSnapshot) model.WindowSnapshot {
+	if len(snap.Temps) == 0 {
+		return snap
+	}
+	temps := make([]float64, len(snap.Temps))
+	copy(temps, snap.Temps)
+	snap.Temps = temps
+	return snap
 }

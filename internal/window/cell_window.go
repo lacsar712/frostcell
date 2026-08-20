@@ -97,6 +97,7 @@ func (w *CellWindow) NewestSample() time.Time {
 }
 
 // IsWindowClosed reports whether the oldest sample spans the full window duration.
+// The caller's processing clock (now) is the sole reference — not sample timestamps.
 func (w *CellWindow) IsWindowClosed(now time.Time) bool {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -108,4 +109,11 @@ func (w *CellWindow) IsWindowClosed(now time.Time) bool {
 	}
 	oldest := w.buf.oldest()
 	return !oldest.After(cutoff)
+}
+
+// SampleTemps returns a copy of buffered temperatures (never aliases internal storage).
+func (w *CellWindow) SampleTemps() []float64 {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.buf.copyTemps()
 }

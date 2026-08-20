@@ -10,7 +10,8 @@ type samplePoint struct {
 
 // ringBuffer is a time-ordered slice-backed buffer for sliding window samples.
 type ringBuffer struct {
-	points []samplePoint
+	points      []samplePoint
+	tempScratch []float64
 }
 
 func newRingBuffer(capacity int) *ringBuffer {
@@ -68,4 +69,30 @@ func (r *ringBuffer) newest() time.Time {
 		return time.Time{}
 	}
 	return r.points[len(r.points)-1].ts
+}
+
+// copyTemps returns a defensive copy of buffered temperatures.
+func (r *ringBuffer) copyTemps() []float64 {
+	if len(r.points) == 0 {
+		return nil
+	}
+	out := make([]float64, len(r.points))
+	for i, p := range r.points {
+		out[i] = p.tempC
+	}
+	return out
+}
+
+// tempsAlias returns the internal temperature scratch used only by buggy builds.
+// Healthy callers must use copyTemps.
+func (r *ringBuffer) ensureTempScratch() []float64 {
+	if cap(r.tempScratch) < len(r.points) {
+		r.tempScratch = make([]float64, len(r.points))
+	} else {
+		r.tempScratch = r.tempScratch[:len(r.points)]
+	}
+	for i, p := range r.points {
+		r.tempScratch[i] = p.tempC
+	}
+	return r.tempScratch
 }

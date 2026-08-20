@@ -12,6 +12,8 @@ type WindowSnapshot struct {
 	OverRatio float64   `json:"overRatio"`
 	WindowEnd time.Time `json:"windowEnd"`
 	WindowDur time.Duration `json:"windowDur"`
+	// Temps is a defensive copy of sample temperatures in the window.
+	Temps []float64 `json:"temps,omitempty"`
 }
 
 // HasData reports whether the window contains at least one sample.
