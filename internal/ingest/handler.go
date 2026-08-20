@@ -44,11 +44,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if h.Secret == "" {
-		http.Error(w, ErrEmptySecret.Error(), http.StatusUnauthorized)
-		return
-	}
-
 	if err := Verify(h.Secret, body, r.Header.Get(HeaderName())); err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
