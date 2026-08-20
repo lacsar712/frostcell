@@ -100,7 +100,7 @@ func (s *Service) sendOne(ctx context.Context, ev model.AlarmEvent) SendResult {
 	s.mu.Unlock()
 
 	start := time.Now()
-	result := s.sender.Send(ctx, ev)
+	result := s.sender.Send(context.Background(), ev)
 	result.Duration = time.Since(start)
 
 	s.mu.Lock()
