@@ -28,7 +28,7 @@ func IsOver(tempC float64, cell model.Cell, mode Mode) bool {
 	case ModeActive:
 		return tempC > cell.UpperLimit()
 	case ModeClearing:
-		return tempC > cell.ClearLimit()
+		return tempC > cell.UpperLimit()
 	default:
 		return tempC > cell.UpperLimit()
 	}
