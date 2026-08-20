@@ -62,7 +62,7 @@ func (c *Coordinator) ProcessSample(sample model.ProbeSample, now time.Time) (mo
 	}
 
 	snap := stats.ToSnapshot(sample.CellID, sample.TS, policy.Cell.WindowDur)
-	closed, err := c.windows.WindowClosed(sample.CellID, sample.TS)
+	closed, err := c.windows.WindowClosed(sample.CellID, now)
 	if err != nil {
 		return model.ProcessingResult{}, err
 	}
